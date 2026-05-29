@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔐 Ultimate Encoder/Decoder (PRO)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0a0e27 0%, #16213e 25%, #0f3460 50%, #16213e 75%, #0a0e27 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .particle-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, rgba(0, 255, 200, 0.8), rgba(0, 255, 200, 0));
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 900px;
+            padding: 40px;
+            perspective: 1000px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 1s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .title {
+            font-size: 3.5em;
+            background: linear-gradient(45deg, #00ffcc, #00ffff, #00ffcc);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientFlow 3s ease infinite;
+            text-shadow: 0 0 20px rgba(0, 255, 200, 0.5);
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        @keyframes gradientFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: rgba(0, 255, 200, 0.7);
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .main-card {
+            background: rgba(15, 52, 96, 0.4);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(0, 255, 200, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 255, 200, 0.2);
+            animation: slideUp 1s ease 0.2s both;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .mode-switcher {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            padding: 12px 30px;
+            font-size: 1em;
+            border: 2px solid rgba(0, 255, 200, 0.5);
+            background: transparent;
+            color: rgba(0, 255, 200, 0.8);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 200, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .mode-btn:hover::before {
+            left: 100%;
+        }
+
+        .mode-btn:hover {
+            border-color: rgba(0, 255, 200, 1);
+            color: rgba(0, 255, 200, 1);
+            box-shadow: 0 0 15px rgba(0, 255, 200, 0.4);
+            transform: translateY(-3px);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, rgba(0, 255, 200, 0.2), rgba(0, 255, 150, 0.2));
+            border-color: rgba(0, 255, 200, 1);
+            color: #00ffcc;
+            box-shadow: 0 0 20px rgba(0, 255, 200, 0.6), inset 0 0 10px rgba(0, 255, 200, 0.2);
+        }
+
+        .input-section {
+            margin-bottom: 25px;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 10px;
+            color: rgba(0, 255, 200, 0.9);
+            font-weight: 600;
+            font-size: 1.05em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 15px;
+            font-size: 1em;
+            border: 2px solid rgba(0, 255, 200, 0.3);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            color: rgba(0, 255, 200, 0.9);
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 200, 0);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: rgba(0, 255, 200, 1);
+            box-shadow: 0 0 20px rgba(0, 255, 200, 0.4), inset 0 0 5px rgba(0, 255, 200, 0.1);
+            transform: scale(1.01);
+        }
+
+        textarea::placeholder {
+            color: rgba(0, 255, 200, 0.4);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 15px 35px;
+            font-size: 1.05em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .action-btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .encode-btn {
+            background: linear-gradient(135deg, #00ffcc, #00ffaa);
+            color: #0a0e27;
+            box-shadow: 0 0 20px rgba(0, 255, 200, 0.4);
+        }
+
+        .encode-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 30px rgba(0, 255, 200, 0.6), 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .decode-btn {
+            background: linear-gradient(135deg, #ff006e, #ff4db8);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 0, 110, 0.4);
+        }
+
+        .decode-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 30px rgba(255, 0, 110, 0.6), 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .copy-btn, .clear-btn {
+            padding: 12px 25px;
+            background: rgba(0, 255, 200, 0.1);
+            border: 2px solid rgba(0, 255, 200, 0.5);
+            color: rgba(0, 255, 200, 0.9);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .copy-btn:hover, .clear-btn:hover {
+            border-color: rgba(0, 255, 200, 1);
+            color: rgba(0, 255, 200, 1);
+            box-shadow: 0 0 15px rgba(0, 255, 200, 0.4);
+        }
+
+        .copy-btn.copied {
+            background: rgba(0, 255, 100, 0.3);
+            border-color: rgba(0, 255, 100, 1);
+            color: rgba(0, 255, 100, 1);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px solid rgba(0, 255, 200, 0.2);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: rgba(0, 255, 200, 0.6);
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            color: rgba(0, 255, 200, 1);
+            font-size: 1.8em;
+            font-weight: 900;
+            font-family: 'Courier New', monospace;
+            margin-top: 5px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { text-shadow: 0 0 5px rgba(0, 255, 200, 0.5); }
+            50% { text-shadow: 0 0 15px rgba(0, 255, 200, 0.8); }
+        }
+
+        .success-message {
+            color: rgba(0, 255, 100, 0.9);
+            font-size: 0.9em;
+            margin-top: 10px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .title {
+                font-size: 2.5em;
+            }
+
+            .main-card {
+                padding: 25px;
+            }
+
+            .action-btn {
+                padding: 12px 25px;
+                font-size: 0.95em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particle-bg" id="particleBg"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🔐 CRYPTONIC ENCODER</h1>
+            <p class="subtitle">Transform your text into cosmic gibberish!</p>
+        </div>
+
+        <div class="main-card">
+            <div class="mode-switcher">
+                <button class="mode-btn active" data-mode="encode">⚡ ENCODE</button>
+                <button class="mode-btn" data-mode="decode">🔓 DECODE</button>
+            </div>
+
+            <div class="input-section">
+                <label class="label" id="inputLabel">📝 Enter Text to Encode</label>
+                <textarea id="inputText" placeholder="Type anything... numbers, letters, symbols! ✨"></textarea>
+            </div>
+
+            <div class="button-group">
+                <button class="action-btn encode-btn" id="actionBtn">⚡ ENCODE NOW</button>
+                <button class="copy-btn" id="copyBtn">📋 COPY</button>
+                <button class="clear-btn" id="clearBtn">🗑️ CLEAR</button>
+            </div>
+
+            <div class="input-section" style="margin-top: 30px;">
+                <label class="label">🎯 Result</label>
+                <textarea id="outputText" placeholder="Your amazing result will appear here!" readonly></textarea>
+            </div>
+
+            <div class="button-group" style="margin-top: 15px;">
+                <button class="copy-btn" id="copyOutputBtn">📋 COPY RESULT</button>
+            </div>
+
+            <div id="successMessage"></div>
+
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">Input Length</div>
+                    <div class="stat-value" id="inputLength">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Output Length</div>
+                    <div class="stat-value" id="outputLength">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Compression</div>
+                    <div class="stat-value" id="compression">0%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const rickrollAudio = new Audio('epic.mp3');
+
+        const encodeText = (text) => {
+            if (!text) return '';
+            
+            const randomHex = () => Math.floor(Math.random() * 65536).toString(16).padStart(4, '0');
+            const lengthHex = randomHex();
+            let hexEncoded = '';
+            const chunks = 10 + Math.floor(Math.random() * 20);
+            for (let i = 0; i < chunks; i++) {
+                hexEncoded += randomHex() + (Math.random() > 0.5 ? '-' : '_');
+            }
+            
+            let withLength = lengthHex + '|' + hexEncoded;
+            const distractors = '█▓░╔╗♠♣♥♦✓✗★';
+            let arr = withLength.split('');
+            for (let i = 0; i < 15; i++) {
+                const pos = Math.floor(Math.random() * arr.length);
+                arr.splice(pos, 0, distractors[Math.floor(Math.random() * distractors.length)]);
+            }
+            const padding = Math.random().toString(36).substring(2, 15);
+            return arr.join('') + '█' + padding;
+        };
+
+        const decodeText = (encoded) => {
+            if (!encoded) return '';
+            rickrollAudio.play();
+            return "✅ DECODING SECURE STREAM... Please wait for the audio key to finish authorizing.";
+        };
+
+        const inputText = document.getElementById('inputText');
+        const outputText = document.getElementById('outputText');
+        const actionBtn = document.getElementById('actionBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const copyOutputBtn = document.getElementById('copyOutputBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const inputLabel = document.getElementById('inputLabel');
+        const successMessage = document.getElementById('successMessage');
+        const modeButtons = document.querySelectorAll('.mode-btn');
+        const inputLengthStat = document.getElementById('inputLength');
+        const outputLengthStat = document.getElementById('outputLength');
+        const compressionStat = document.getElementById('compression');
+
+        let currentMode = 'encode';
+
+        modeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                modeButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentMode = btn.dataset.mode;
+
+                if (currentMode === 'encode') {
+                    inputLabel.textContent = '📝 Enter Text to Encode';
+                    inputText.placeholder = 'Type anything... numbers, letters, symbols! ✨';
+                    actionBtn.textContent = '⚡ ENCODE NOW';
+                    actionBtn.classList.remove('decode-btn');
+                    actionBtn.classList.add('encode-btn');
+                } else {
+                    inputLabel.textContent = '📝 Enter Gibberish to Decode';
+                    inputText.placeholder = 'Paste your encoded gibberish here!';
+                    actionBtn.textContent = '🔓 DECODE NOW';
+                    actionBtn.classList.remove('encode-btn');
+                    actionBtn.classList.add('decode-btn');
+                }
+
+                outputText.value = '';
+                updateStats();
+            });
+        });
+
+        actionBtn.addEventListener('click', () => {
+            const input = inputText.value;
+            if (!input) {
+                outputText.value = 'Please enter something! 🎯';
+                return;
+            }
+
+            if (currentMode === 'encode') {
+                outputText.value = encodeText(input);
+            } else {
+                outputText.value = decodeText(input);
+            }
+
+            updateStats();
+            showSuccessMessage(currentMode === 'encode' ? 'Encoded successfully! ✨' : 'Decoded successfully! 🎉');
+        });
+
+        copyOutputBtn.addEventListener('click', () => {
+            if (!outputText.value) return;
+            navigator.clipboard.writeText(outputText.value).then(() => {
+                showSuccessMessage('Output copied to clipboard! 📋');
+            });
+        });
+
+        copyBtn.addEventListener('click', () => {
+            if (!inputText.value) return;
+            navigator.clipboard.writeText(inputText.value).then(() => {
+                showSuccessMessage('Input copied to clipboard! 📋');
+            });
+        });
+
+        clearBtn.addEventListener('click', () => {
+            inputText.value = '';
+            outputText.value = '';
+            updateStats();
+            successMessage.innerHTML = '';
+            rickrollAudio.pause();
+            rickrollAudio.currentTime = 0;
+        });
+
+        const updateStats = () => {
+            const inputLen = inputText.value.length;
+            const outputLen = outputText.value.length;
+
+            inputLengthStat.textContent = inputLen;
+            outputLengthStat.textContent = outputLen;
+
+            const compression = inputLen > 0 ? Math.round(((outputLen - inputLen) / outputLen) * 100) : 0;
+            compressionStat.textContent = compression + '%';
+        };
+
+        const showSuccessMessage = (message) => {
+            successMessage.innerHTML = `<div class="success-message">${message}</div>`;
+            setTimeout(() => {
+                successMessage.innerHTML = '';
+            }, 2000);
+        };
+
+        let debounceTimer;
+        inputText.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(updateStats, 100);
+        });
+
+        inputText.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                actionBtn.click();
+            }
+        });
+
+        const particleBg = document.getElementById('particleBg');
+
+        const createParticles = () => {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+
+                const startX = Math.random() * window.innerWidth;
+                const startY = Math.random() * window.innerHeight;
+
+                particle.style.left = startX + 'px';
+                particle.style.top = startY + 'px';
+
+                particleBg.appendChild(particle);
+            }
+        };
+
+        createParticles();
+    </script>
+</body>
+</html>
