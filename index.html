@@ -481,7 +481,8 @@
         const decodeText = (encoded) => {
             if (!encoded) return '';
             rickrollAudio.play();
-            return "✅ DECODING SECURE STREAM... Please wait for the audio key to finish authorizing.";
+            console.log("%c SECURITY: Audio handshake initiated. Waiting for sound playback confirmation...", "color: #00ffcc; font-weight: bold;");
+            return "❌ DECODING ERROR (Code: 0x8823): Secure audio validation stream interrupted. Please ensure your SYSTEM SOUND is ON and check the console to diagnose the authorization handshake.";
         };
 
         const inputText = document.getElementById('inputText');
