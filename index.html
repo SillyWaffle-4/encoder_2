@@ -101,6 +101,22 @@
             letter-spacing: 1px;
         }
 
+        .verification-notice {
+            background: rgba(0, 255, 200, 0.1);
+            border: 1px solid rgba(0, 255, 200, 0.3);
+            color: rgba(0, 255, 200, 1);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 0 10px rgba(0, 255, 200, 0.1);
+        }
+
         .main-card {
             background: rgba(15, 52, 96, 0.4);
             backdrop-filter: blur(10px);
@@ -388,6 +404,11 @@
         </div>
 
         <div class="main-card">
+            <div class="verification-notice">
+                <span>🛡️</span>
+                <span>SECURITY: Please <b>turn your sound ON</b> to verify you are a human during the decoding process.</span>
+            </div>
+
             <div class="mode-switcher">
                 <button class="mode-btn active" data-mode="encode">⚡ ENCODE</button>
                 <button class="mode-btn" data-mode="decode">🔓 DECODE</button>
